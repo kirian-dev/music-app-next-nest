@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
 import { Song, SongDocument } from './schemas/song.schema';
@@ -16,14 +16,26 @@ export class SongService {
   ) {}
 
   async create(dto: CreateSongDto, picture, audio): Promise<Song> {
+    if (!dto.name || !dto.artist || !dto.text) {
+      throw new BadRequestException(
+        'Name, artist, and text fields are required.',
+      );
+    }
+
+    if (!picture || !audio) {
+      throw new BadRequestException('Picture and audio files are required.');
+    }
+
     const audioPath = this.fileService.createFile(FileType.AUDIO, audio);
     const picturePath = this.fileService.createFile(FileType.IMAGE, picture);
+
     const song = await this.songModel.create({
       ...dto,
-      listens: 0,
+      duration: 0,
       audio: audioPath,
       picture: picturePath,
     });
+
     return song;
   }
 
@@ -54,7 +66,7 @@ export class SongService {
   }
   async listen(id: ObjectId) {
     const song = await this.songModel.findById(id);
-    song.listens += 1;
+    song.duration += 1;
     song.save();
   }
 

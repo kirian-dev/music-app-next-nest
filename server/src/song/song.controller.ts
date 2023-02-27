@@ -15,7 +15,7 @@ import { SongService } from './song.service';
 import { ObjectId } from 'mongoose';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
-@Controller('/song')
+@Controller('songs')
 export class SongController {
   constructor(private songService: SongService) {}
 
@@ -36,7 +36,7 @@ export class SongController {
     return this.songService.findAll(count, offset);
   }
 
-  @Get('/search')
+  @Get('search')
   search(@Query('query') query: string) {
     return this.songService.search(query);
   }
@@ -51,12 +51,12 @@ export class SongController {
     return this.songService.delete(id);
   }
 
-  @Post('/comment')
+  @Post('comment')
   addComment(@Body() dto: CreateCommentDto) {
     return this.songService.addComment(dto);
   }
 
-  @Post('/listen/:id')
+  @Post('listen/:id')
   listen(@Param('id') id: ObjectId) {
     return this.songService.listen(id);
   }
